@@ -1,0 +1,61 @@
+services:
+  db:
+    image: mariadb:latest
+    container_name: db
+    command: '--default-authentication-plugin=mysql_native_password'
+    restart: always
+    secrets:
+      - db-password
+    volumes:
+      - db-data:/var/lib/mysql
+    hostname: mysqlhost
+    networks:
+      backnet:
+        aliases:
+          - mysqlhost
+    environment:
+      - MYSQL_DATABASE=flaskapp
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db-password
+    expose:
+      - 3306
+      - 33060
+
+  backend:
+    container_name: backend
+    image: graves869/rfm_backend:latest
+    restart: always
+    secrets:
+      - db-password
+    ports:
+      - 31337:31337
+    networks:
+      - backnet
+      - frontnet
+    depends_on:
+      - db
+
+  frontend:
+    container_name: frontend
+    image: graves869/rfm_frontend:latest
+    restart: always
+    networks:
+      - frontnet
+    depends_on:
+      - backend
+    ports:
+      - 80:80
+      - 443:443
+
+volumes:
+  db-data:
+    name: db-data
+
+secrets:
+  db-password:
+    file: db/password.txt
+
+networks:
+  backnet:
+    name: backnet
+  frontnet:
+    name: frontnet
