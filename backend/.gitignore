@@ -1,0 +1,48 @@
+# Environment
+.env
+.env.local
+.env.*.local
+.venv
+venv
+ENV
+
+# Secrets
+*.secret
+secrets/
+db/password.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+.tox/
+htmlcov/
+.hypothesis/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Credentials
+*.pem
+*.key
+*.crt

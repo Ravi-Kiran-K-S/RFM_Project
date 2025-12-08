@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import (
@@ -9,12 +10,24 @@ from flask_jwt_extended import (
 from models import Session, Users
 from werkzeug.security import check_password_hash, generate_password_hash
 
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
+
 app = Flask(__name__)
-app.config["JWT_SECRET_KEY"] = (
-    "c8fb1ec1e192976c1c9fa5aa5e31c911649e6d1e031447ad3596fb5bcaf06739"
-)
+
+# Get JWT secret from environment variable
+jwt_secret = os.getenv("JWT_SECRET_KEY")
+if not jwt_secret:
+    raise ValueError("JWT_SECRET_KEY environment variable is not set. Please configure it properly.")
+
+app.config["JWT_SECRET_KEY"] = jwt_secret
+
 jwt = JWTManager(app)
-CORS(app, supports_credentials=True)
+
+# Configure CORS with allowed origins from environment
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:80")
+CORS(app, origins=cors_origins.split(","), supports_credentials=True)
 
 
 @app.route("/api/users")

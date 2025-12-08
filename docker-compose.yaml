@@ -1,9 +1,9 @@
 services:
   db:
-    image: mariadb:latest
+    image: mariadb:11.0
     container_name: db
     command: '--default-authentication-plugin=mysql_native_password'
-    restart: always
+    restart: unless-stopped
     secrets:
       - db-password
     volumes:
@@ -14,41 +14,77 @@ services:
         aliases:
           - mysqlhost
     environment:
-      - MYSQL_DATABASE=flaskapp
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-flaskapp}
       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db-password
+      - MYSQL_INITDB_SKIP_TZINFO=1
     expose:
       - 3306
       - 33060
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
 
   backend:
     container_name: backend
-    image: graves869/rfm_backend:latest
-    restart: always
+    image: ${BACKEND_IMAGE:-ravikiranks/rfm_backend:latest}
+    restart: unless-stopped
     secrets:
       - db-password
+    env_file:
+      - backend/.env
+    environment:
+      - MYSQL_HOST=mysqlhost
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-flaskapp}
+      - MYSQL_USER=${MYSQL_USER:-root}
+      - FLASK_ENV=${FLASK_ENV:-production}
     ports:
-      - 31337:31337
+      - "${BACKEND_PORT:-31337}:${BACKEND_PORT:-31337}"
     networks:
       - backnet
       - frontnet
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
 
   frontend:
     container_name: frontend
-    image: graves869/rfm_frontend:latest
-    restart: always
+    image: ${FRONTEND_IMAGE:-ravikiranks/rfm_frontend:latest}
+    restart: unless-stopped
     networks:
       - frontnet
     depends_on:
       - backend
     ports:
-      - 80:80
-      - 443:443
+      - "80:80"
+      - "443:443"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
 
 volumes:
   db-data:
     name: db-data
+    driver: local
 
 secrets:
   db-password:
@@ -57,5 +93,7 @@ secrets:
 networks:
   backnet:
     name: backnet
+    driver: bridge
   frontnet:
     name: frontnet
+    driver: bridge

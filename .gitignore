@@ -1,0 +1,70 @@
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Secrets
+db/password.txt
+db/secrets
+db/*.secret
+*.secret
+secrets/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.iml
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+
+# Docker
+.docker/
+
+# Logs
+logs/
+*.log
+
+# Jenkins
+.jenkins/
+
+# Git
+.git/
+
+# Sensitive files
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
