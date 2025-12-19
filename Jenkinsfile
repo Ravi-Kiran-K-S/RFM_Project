@@ -22,7 +22,7 @@ pipeline {
       steps {
         script {
           echo "Validating docker-compose.yaml..."
-          sh 'docker-compose -f docker-compose.yaml config > /dev/null'
+          sh 'docker compose -f docker-compose.yaml config > /dev/null'
           echo "✓ docker-compose.yaml is valid"
         }
       }

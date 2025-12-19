@@ -24,12 +24,12 @@
         - "../backend/.env"
 
     - name: Pull latest Docker images
-      shell: "docker-compose -f {{ deploy_path }}/docker-compose.yaml pull"
+      shell: "docker compose -f {{ deploy_path }}/docker-compose.yaml pull"
       register: pull_result
       changed_when: "'Downloaded newer image' in pull_result.stdout"
 
     - name: Start or Update Services
-      shell: "docker-compose -f {{ deploy_path }}/docker-compose.yaml up -d --remove-orphans"
+      shell: "docker compose -f {{ deploy_path }}/docker-compose.yaml up -d --remove-orphans"
       
     - name: Prune unused images to save space
       shell: "docker image prune -f"
