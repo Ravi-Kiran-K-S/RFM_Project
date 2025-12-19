@@ -1,0 +1,35 @@
+---
+- name: Deploy RFM Application
+  hosts: all
+  become: yes
+  vars:
+    # This matches the directory created in your Jenkinsfile
+    deploy_path: "/opt/rfm_app"
+
+  tasks:
+    - name: Create deployment directory
+      file:
+        path: "{{ deploy_path }}"
+        state: directory
+        mode: '0755'
+
+    - name: Copy docker-compose and configuration files
+      copy:
+        src: "{{ item }}"
+        dest: "{{ deploy_path }}/"
+        mode: '0644'
+      with_items:
+        - "docker-compose.yaml"
+        - "db"
+        - "../backend/.env"
+
+    - name: Pull latest Docker images
+      shell: "docker-compose -f {{ deploy_path }}/docker-compose.yaml pull"
+      register: pull_result
+      changed_when: "'Downloaded newer image' in pull_result.stdout"
+
+    - name: Start or Update Services
+      shell: "docker-compose -f {{ deploy_path }}/docker-compose.yaml up -d --remove-orphans"
+      
+    - name: Prune unused images to save space
+      shell: "docker image prune -f"
