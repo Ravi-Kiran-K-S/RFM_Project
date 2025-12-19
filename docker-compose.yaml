@@ -22,7 +22,7 @@ services:
       - 33060
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
+      timeout: 60s
       retries: 10
       interval: 10s
     security_opt:
