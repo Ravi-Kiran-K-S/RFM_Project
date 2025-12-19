@@ -1,7 +1,6 @@
 ---
 - name: Deploy RFM Application
   hosts: all
-  become: yes
   vars:
     # This matches the directory created in your Jenkinsfile
     deploy_path: "/opt/rfm_app"
